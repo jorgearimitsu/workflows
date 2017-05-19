@@ -1,0 +1,14 @@
+{
+  "name": "workflows",
+  "version": "0.0.1",
+  "description": "A learning project",
+  "main": "index.js",
+
+  "repository": {
+    "type": "git",
+    "url": "?.git"
+  },
+  
+  "author": "Jorge Arimitsu",
+  "license": "ISC"
+}
