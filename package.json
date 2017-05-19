@@ -5,7 +5,7 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "?.git"
+    "url": "https://github.com/jorgearimitsu/workflows.git"
   },
   "author": "Jorge Arimitsu",
   "license": "ISC",
