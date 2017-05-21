@@ -3,38 +3,62 @@ var gulp = require('gulp'),
     coffee = require('gulp-coffee'),
     concat = require('gulp-concat'),
     compass = require('gulp-compass'),
-    browserify = require('gulp-browserify');
+    browserify = require('gulp-browserify'),
 
-var scriptSources = [
-  'components/scripts/rclick.js',
-  'components/scripts/pixgrid.js',
-  'components/scripts/tagline.js',
-  'components/scripts/template.js'
-];
+    paths = {
+      coffees: [
+        'components/coffee/tagline.coffee'
+      ],
+
+      scripts: [
+        'components/scripts/rclick.js',
+        'components/scripts/pixgrid.js',
+        'components/scripts/tagline.js',
+        'components/scripts/template.js'
+      ],
+
+      script: 'components/scripts',
+
+      sass: 'components/sass',
+
+      css: 'builds/development/css',
+
+      images: 'builds/development/images',
+
+      js: 'builds/development/js',
+
+      build: 'builds/development'
+    };
 
 gulp.task('coffee', function() {
-  gulp.src('components/coffee/tagline.coffee')
+  gulp.src(paths.coffees)
     .pipe(coffee({ bare: true })
       .on('error', gutil.log))
-    .pipe(gulp.dest('components/scripts'));
+    .pipe(gulp.dest(paths.script));
 });
 
 gulp.task('js', function() {
-  gulp.src(scriptSources)
+  gulp.src(paths.scripts)
   .pipe(concat('script.js'))
   .pipe(browserify())
-  .pipe(gulp.dest('builds/development/js'));
+  .pipe(gulp.dest(paths.js));
 });
 
 gulp.task('compass', function() {
   gulp.src('components/sass/style.scss')
     .pipe(compass({
-      sass: 'components/sass',
-      image: 'builds/development/images',
+      sass: paths.sass,
+      image: paths.images,
       style: 'expanded'
     }))
     .on('error', gutil.log)
-    .pipe(gulp.dest('builds/development/css'));
+    .pipe(gulp.dest(paths.css));
 });
 
-gulp.task('default', ['coffee', 'js', 'compass']);
+gulp.task('watch', function() {
+  gulp.watch(paths.coffees, ['coffee']);
+  gulp.watch(paths.script, ['js']);
+  gulp.watch(paths.sass, ['compass']);
+});
+
+gulp.task('default', ['coffee', 'js', 'compass', 'watch']);
