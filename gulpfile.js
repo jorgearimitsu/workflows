@@ -4,61 +4,70 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     compass = require('gulp-compass'),
     browserify = require('gulp-browserify'),
+    connect = require('gulp-connect');
 
     paths = {
-      coffees: [
-        'components/coffee/tagline.coffee'
-      ],
+      scripts: {
+        dir: 'components/scripts',
 
-      scripts: [
-        'components/scripts/rclick.js',
-        'components/scripts/pixgrid.js',
-        'components/scripts/tagline.js',
-        'components/scripts/template.js'
-      ],
+        build: 'builds/development/js',
 
-      script: 'components/scripts',
+        files: 'components/scripts/*.js',
 
-      sass: 'components/sass',
+        coffees: 'components/coffee/*.coffee'
+      },
+
+      sass: {
+        dir: 'components/sass',
+
+        files: 'components/sass/*.scss'
+      },
+
+      build: 'builds/development',
 
       css: 'builds/development/css',
 
-      images: 'builds/development/images',
-
-      js: 'builds/development/js',
-
-      build: 'builds/development'
+      images: 'builds/development/images'
     };
 
+gulp.task('connect', function() {
+  connect.server({
+    root: paths.build,
+    livereload: true
+  });
+});
+
 gulp.task('coffee', function() {
-  gulp.src(paths.coffees)
+  gulp.src(paths.scripts.coffees)
     .pipe(coffee({ bare: true })
       .on('error', gutil.log))
-    .pipe(gulp.dest(paths.script));
+    .pipe(gulp.dest(paths.scripts.dir));
 });
 
 gulp.task('js', function() {
-  gulp.src(paths.scripts)
-  .pipe(concat('script.js'))
-  .pipe(browserify())
-  .pipe(gulp.dest(paths.js));
+  gulp.src(paths.scripts.files)
+    .pipe(concat('script.js'))
+    .pipe(browserify())
+    .pipe(gulp.dest(paths.scripts.build))
+    .pipe(connect.reload());
 });
 
 gulp.task('compass', function() {
   gulp.src('components/sass/style.scss')
     .pipe(compass({
-      sass: paths.sass,
+      sass: paths.sass.dir,
       image: paths.images,
       style: 'expanded'
     }))
     .on('error', gutil.log)
-    .pipe(gulp.dest(paths.css));
+    .pipe(gulp.dest(paths.css))
+    .pipe(connect.reload());
 });
 
 gulp.task('watch', function() {
-  gulp.watch(paths.coffees, ['coffee']);
-  gulp.watch(paths.script, ['js']);
-  gulp.watch(paths.sass, ['compass']);
+  gulp.watch(paths.scripts.coffees, ['coffee']);
+  gulp.watch(paths.scripts.files, ['js']);
+  gulp.watch(paths.sass.files, ['compass']);
 });
 
-gulp.task('default', ['coffee', 'js', 'compass', 'watch']);
+gulp.task('default', ['connect', 'coffee', 'js', 'compass', 'watch']);
