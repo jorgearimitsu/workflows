@@ -8,13 +8,15 @@ var gulp = require('gulp'),
 
     paths = {
       scripts: {
-        dir: 'components/scripts',
-
         build: 'builds/development/js',
+
+        coffees: 'components/coffee/*.coffee',
+
+        dir: 'components/scripts',
 
         files: 'components/scripts/*.js',
 
-        coffees: 'components/coffee/*.coffee'
+        json: 'builds/development/js/*.json'
       },
 
       sass: {
@@ -23,18 +25,27 @@ var gulp = require('gulp'),
         files: 'components/sass/*.scss'
       },
 
-      build: 'builds/development',
+      build: {
+        css: 'builds/development/css',
 
-      css: 'builds/development/css',
+        dir: 'builds/development',
 
-      images: 'builds/development/images'
+        html: 'builds/development/*.html',
+
+        images: 'builds/development/images'
+      }
     };
 
 gulp.task('connect', function() {
   connect.server({
-    root: paths.build,
+    root: paths.build.dir,
     livereload: true
   });
+});
+
+gulp.task('html', function() {
+  gulp.src(paths.build.html)
+    .pipe(connect.reload());
 });
 
 gulp.task('coffee', function() {
@@ -56,18 +67,25 @@ gulp.task('compass', function() {
   gulp.src('components/sass/style.scss')
     .pipe(compass({
       sass: paths.sass.dir,
-      image: paths.images,
+      image: paths.build.images,
       style: 'expanded'
     }))
     .on('error', gutil.log)
-    .pipe(gulp.dest(paths.css))
+    .pipe(gulp.dest(paths.build.css))
+    .pipe(connect.reload());
+});
+
+gulp.task('json', function() {
+  gulp.src(paths.scripts.json)
     .pipe(connect.reload());
 });
 
 gulp.task('watch', function() {
+  gulp.watch(paths.build.html, ['html']);
   gulp.watch(paths.scripts.coffees, ['coffee']);
   gulp.watch(paths.scripts.files, ['js']);
+  gulp.watch(paths.scripts.json, ['json']);
   gulp.watch(paths.sass.files, ['compass']);
 });
 
-gulp.task('default', ['connect', 'coffee', 'js', 'compass', 'watch']);
+gulp.task('default', ['html', 'coffee', 'js', 'json', 'compass', 'connect', 'watch']);
