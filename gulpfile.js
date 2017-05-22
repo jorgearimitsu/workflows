@@ -1,3 +1,4 @@
+// require packages
 var gulp = require('gulp'),
     gutil = require('gulp-util'),
     coffee = require('gulp-coffee'),
@@ -5,9 +6,15 @@ var gulp = require('gulp'),
     compass = require('gulp-compass'),
     browserify = require('gulp-browserify'),
     connect = require('gulp-connect'),
+    gulpif = require('gulp-if'),
+    uglify = require ('gulp-uglify'),
+
+
+    // conditional enviroment variables
     outputSrc = 'builds/development/',
     env = process.env.NODE_ENV;
 
+// conditional enviroment output
 if ( env === 'production' ) {
   outputSrc = 'builds/production/';
 }
@@ -69,6 +76,7 @@ gulp.task('js', function() {
   gulp.src(paths.scripts.files)
     .pipe(concat('script.js'))
     .pipe(browserify())
+    .pipe(gulpif( env === 'production', uglify() ))
     .pipe(gulp.dest(paths.build.js))
     .pipe(connect.reload());
 });
