@@ -8,6 +8,7 @@ var gulp = require('gulp'),
     connect = require('gulp-connect'),
     gulpif = require('gulp-if'),
     uglify = require ('gulp-uglify'),
+    minifyHTML = require('gulp-minify-html'),
 
 
     // conditional enviroment variables
@@ -39,7 +40,7 @@ var paths = {
   build: {
     css: outputSrc + 'css',
 
-    html: outputSrc + '*.html',
+    html: 'builds/development/*.html',
 
     images: 'builds/development/images',
 
@@ -56,12 +57,10 @@ gulp.task('connect', function() {
   });
 });
 
-gulp.task('vish', function() {
-  gutil.log(env);
-});
-
 gulp.task('html', function() {
   gulp.src(paths.build.html)
+    .pipe(gulpif( env === 'production',  minifyHTML() ))
+    .pipe(gulpif( env === 'production', gulp.dest(outputSrc) ))
     .pipe(connect.reload());
 });
 
