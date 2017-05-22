@@ -4,43 +4,53 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     compass = require('gulp-compass'),
     browserify = require('gulp-browserify'),
-    connect = require('gulp-connect');
+    connect = require('gulp-connect'),
+    outputSrc = 'builds/development/',
+    env = process.env.NODE_ENV;
 
-    paths = {
-      scripts: {
-        build: 'builds/development/js',
+if ( env === 'production' ) {
+  outputSrc = 'builds/production/';
+}
 
-        coffees: 'components/coffee/*.coffee',
+var paths = {
+  scripts: {
+    coffees: 'components/coffee/*.coffee',
 
-        dir: 'components/scripts',
+    src: 'components/scripts',
 
-        files: 'components/scripts/*.js',
+    files: 'components/scripts/*.js',
 
-        json: 'builds/development/js/*.json'
-      },
+    json: 'builds/development/js/*.json'
+  },
 
-      sass: {
-        dir: 'components/sass',
+  sass: {
+    src: 'components/sass',
 
-        files: 'components/sass/*.scss'
-      },
+    files: 'components/sass/*.scss'
+  },
 
-      build: {
-        css: 'builds/development/css',
+  build: {
+    css: outputSrc + 'css',
 
-        dir: 'builds/development',
+    html: outputSrc + '*.html',
 
-        html: 'builds/development/*.html',
+    images: 'builds/development/images',
 
-        images: 'builds/development/images'
-      }
-    };
+    js: outputSrc + 'js',
+
+    src: outputSrc
+  }
+};
 
 gulp.task('connect', function() {
   connect.server({
-    root: paths.build.dir,
+    root: paths.build.src,
     livereload: true
   });
+});
+
+gulp.task('vish', function() {
+  gutil.log(env);
 });
 
 gulp.task('html', function() {
@@ -52,21 +62,21 @@ gulp.task('coffee', function() {
   gulp.src(paths.scripts.coffees)
     .pipe(coffee({ bare: true })
       .on('error', gutil.log))
-    .pipe(gulp.dest(paths.scripts.dir));
+    .pipe(gulp.dest(paths.scripts.src));
 });
 
 gulp.task('js', function() {
   gulp.src(paths.scripts.files)
     .pipe(concat('script.js'))
     .pipe(browserify())
-    .pipe(gulp.dest(paths.scripts.build))
+    .pipe(gulp.dest(paths.build.js))
     .pipe(connect.reload());
 });
 
 gulp.task('compass', function() {
   gulp.src('components/sass/style.scss')
     .pipe(compass({
-      sass: paths.sass.dir,
+      sass: paths.sass.src,
       image: paths.build.images,
       style: 'expanded'
     }))
