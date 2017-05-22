@@ -10,6 +10,7 @@ var gulp = require('gulp'),
     uglify = require ('gulp-uglify'),
     minifyHTML = require('gulp-minify-html'),
     jsonminify = require('gulp-jsonminify'),
+    imagemin = require('gulp-imagemin'),
 
 
     // conditional enviroment variables
@@ -43,7 +44,9 @@ var paths = {
 
     html: 'builds/development/*.html',
 
-    images: 'builds/development/images',
+    images: 'builds/development/images/**/*.*',
+
+    prodImages: 'builds/production/images',
 
     js: outputSrc + 'js',
 
@@ -100,12 +103,22 @@ gulp.task('json', function() {
     .pipe(connect.reload());
 });
 
+gulp.task('images', function() {
+  gulp.src(paths.build.images)
+    .pipe(imagemin({
+      progressive: true,
+      svgoPlugin: [{ removeViewBox : true }]
+    }))
+    .pipe(gulp.dest(paths.build.prodImages))
+});
+
 gulp.task('watch', function() {
   gulp.watch(paths.build.html, ['html']);
   gulp.watch(paths.scripts.coffees, ['coffee']);
   gulp.watch(paths.scripts.files, ['js']);
   gulp.watch(paths.scripts.json, ['json']);
   gulp.watch(paths.sass.files, ['compass']);
+  gulp.watch(paths.build.images, ['images']);
 });
 
 gulp.task('default', ['html', 'coffee', 'js', 'json', 'compass', 'connect', 'watch']);
