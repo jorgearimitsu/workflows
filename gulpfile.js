@@ -9,6 +9,7 @@ var gulp = require('gulp'),
     gulpif = require('gulp-if'),
     uglify = require ('gulp-uglify'),
     minifyHTML = require('gulp-minify-html'),
+    jsonminify = require('gulp-jsonminify'),
 
 
     // conditional enviroment variables
@@ -94,6 +95,8 @@ gulp.task('compass', function() {
 
 gulp.task('json', function() {
   gulp.src(paths.scripts.json)
+    .pipe(gulpif( env === 'production', jsonminify() ))
+    .pipe(gulpif( env === 'production', gulp.dest(paths.build.js) ))
     .pipe(connect.reload());
 });
 
